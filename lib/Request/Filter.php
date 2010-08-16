@@ -45,7 +45,7 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	public function offsetUnset($name) {
 		unset($this->raw[$name]);
 		unset($this->text[$name]);
-		unset($this->text[$filter]);
+		unset($this->filter[$name]);
 	}
 	
 	public function getIterator() {
