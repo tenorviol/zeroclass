@@ -5,7 +5,7 @@ require_once __DIR__.'/../base.php';
 /**
  * Testing the Request_Server class.
  */
-class Test_Request_Filter extends PHPUnit_Framework_TestCase {
+class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 	
 	public function impliedFilterProvider() {
 		return array(

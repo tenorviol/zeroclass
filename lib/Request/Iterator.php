@@ -2,20 +2,20 @@
 
 class Request_Iterator implements Iterator {
 	
-	private $filter;
+	private $array;
 	private $keys;
 	private $count;
 	private $marker;
 	
-	public function __construct(Request_Filter $filter, array $keys) {
-		$this->filter = $filter;
+	public function __construct($array, $keys) {
+		$this->array = $array;
 		$this->keys = $keys;
 		$this->count = count($keys);
 		$this->marker = 0;
 	}
 	
 	public function current() {
-		return $this->filter[$this->key()];
+		return $this->array[$this->key()];
 	}
 	
 	public function key() {
