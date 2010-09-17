@@ -9,6 +9,7 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 	
 	public function impliedFilterProvider() {
 		return array(
+			array('', ''),
 			array('bar', 'bar'),
 			array('bar <script>alert(666);</script>', 'bar alert(666);'),
 			array('<b>bar</b>', 'bar'),
@@ -42,7 +43,7 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 		
 		// accessing via get method adds an optional default value
 		$result = $filter->get('foo', 'default');
-		if ($get) {
+		if (is_string($get)) {
 			$this->assertEquals($get, $result);
 		} else {
 			$this->assertEquals('default', $result);
@@ -72,7 +73,7 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 		$filter = new Request_Filter($array);
 		
 		$result = $filter->text('foo');
-		if ($get) {
+		if (is_string($get)) {
 			$expected = $text === false ? $array['foo'] : $text;
 			$this->assertEquals($expected, $result);
 		} else {
@@ -82,9 +83,50 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 	
 	public function testUnsetOffset_Should_ReturnDefaultValue() {
 		$filter = new Request_Filter(array('invalid'=>"\xff"));
+		
+		// text
 		$this->assertEquals(null, $filter->text('foo'));
 		$this->assertEquals('bar', $filter->text('foo', 'bar'));
 		$this->assertEquals("\xff", $filter->text('foo', "\xff"));    // default not be filtered
 		$this->assertEquals('bar', $filter->text('invalid', 'bar'));  // invalid text triggers default
+		
+		// binary
+		$this->assertEquals('bar', $filter->binary('foo', 'bar'));
+		
+		// boolean
+		$this->assertEquals('bar', $filter->boolean('foo', 'bar'));
+	}
+	
+	public function booleanTests() {
+		return array(
+			array('on', true),
+			array('On', true),
+			array('oN', true),
+			array('true', true),
+			array('1', true),
+			array('OFF', false),
+			array('false', false),
+			array('0', false),
+			array('2', false),
+			array('2', 'default', 'default'),
+		);
+	}
+	
+	/**
+	 * @dataProvider booleanTests
+	 */
+	public function testBoolean_Should_ReturnBoolean($string, $expected, $default = false) {
+		$filter = new Request_Filter(array('foo'=>$string));
+		$result = $filter->boolean('foo', $default);
+		$this->assertEquals($expected, $result);
+	}
+	
+	/**
+	 * @dataProvider impliedFilterProvider
+	 */
+	public function testBinary_Should_ReturnValueUnchanged($string) {
+		$filter = new Request_Filter((array('foo'=>$string)));
+		$result = $filter->binary('foo');
+		$this->assertEquals($string, $result);
 	}
 }

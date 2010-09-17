@@ -84,8 +84,21 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		return str_replace($needles, '', $text);
 	}
 	
+	public function boolean($name, $default = false) {
+		$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+		if ($boolean === null) {
+			return $default;
+		} else {
+			return $boolean;
+		}
+	}
+	
 	public function binary($name, $default = null) {
-		throw new Exception('Unimplemented');
+		if (isset($this->raw[$name])) {
+			return $this->raw[$name];
+		} else {
+			return $default;
+		}
 	}
 	
 	public function int($name, $default = 0) {
