@@ -11,6 +11,8 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	private $utf8 = array();
 	private $text = array();
 	private $strip = array();
+	private $boolean = array();
+	private $int = array();
 	
 	public function __construct(array $array) {
 		$this->raw = $array;
@@ -101,17 +103,27 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		}
 	}
 	
-	public function boolean($name, $default = false) {
-		$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-		if ($boolean === null) {
-			return $default;
+	public function boolean($name, $default = null) {
+		if (!isset($this->boolean[$name])) {
+			$this->boolean[$name] = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+		}
+		if ($this->boolean[$name] !== null) {
+			return $this->boolean[$name];
 		} else {
-			return $boolean;
+			return $default;
 		}
 	}
 	
-	public function int($name, $default = 0) {
-		throw new Exception('Unimplemented');
+	public function int($name, $default = null) {
+		if (!isset($this->int[$name])) {
+			$int = filter_var(@$this->raw[$name], FILTER_VALIDATE_INT);
+			$this->int[$name] = is_int($int) ? $int : null;
+		}
+		if ($this->int[$name] !== null) {
+			return $this->int[$name];
+		} else {
+			return $default;
+		}
 	}
 	
 	public function float($name, $default = 0.0) {

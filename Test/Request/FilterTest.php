@@ -120,6 +120,9 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 		
 		// boolean
 		$this->assertEquals('bar', $filter->boolean('foo', 'bar'));
+		
+		// boolean
+		$this->assertEquals('bar', $filter->int('foo', 'bar'));
 	}
 	
 	public function booleanTests() {
@@ -140,9 +143,32 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider booleanTests
 	 */
-	public function testBoolean_Should_ReturnBoolean($string, $expected, $default = false) {
+	public function testBoolean_Should_ReturnBooleans($string, $expected, $default = false) {
 		$filter = new Request_Filter(array('foo'=>$string));
 		$result = $filter->boolean('foo', $default);
+		$this->assertEquals($expected, $result);
+	}
+	
+	public function intTests() {
+		return array(
+			array('1', 1),
+			array('-1', -1),
+			array('42', 42),
+			array('42', 42),
+			array('9223372036854775807', 9223372036854775807),
+			array('9223372036854775808', null),
+			array('8c', null),
+			array('', null),
+			array('012', null),  // no octals
+		);
+	}
+	
+	/**
+	 * @dataProvider intTests
+	 */
+	public function testInt_Should_ReturnIntegers($string, $expected) {
+		$filter = new Request_Filter(array('foo'=>$string));
+		$result = $filter->int('foo');
 		$this->assertEquals($expected, $result);
 	}
 }
