@@ -8,8 +8,9 @@
 class Request_Filter implements ArrayAccess, IteratorAggregate {
     
 	private $raw;
+	private $utf8 = array();
 	private $text = array();
-	private $filter = array();
+	private $strip = array();
 	
 	public function __construct(array $array) {
 		$this->raw = $array;
@@ -39,21 +40,19 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	}
 	
 	public function get($name, $default = null) {
-		if (!isset($this->filter[$name])) {
-			$raw = $this->raw[$name];
-			if (is_array($raw)) {
-				$filter = new Request_Filter($raw);
+		if (!isset($this->strip[$name])) {
+			if (is_array($this->raw[$name])) {
+				$this->strip[$name] = new Request_Filter($this->raw[$name]);
 			} else {
-				$filter = strval($raw);
-				if ($this->isValidEncoding($filter)) {
-					$filter = $this->stripControlCodes(filter_var($filter, FILTER_SANITIZE_STRING));
-				} else {
-					return $default;
-				}
+				$text = $this->text($name);
+				$this->strip[$name] = $text === null ? null : filter_var($text, FILTER_SANITIZE_STRING);
 			}
-			$this->filter[$name] = $filter;
 		}
-		return $this->filter[$name];
+		if ($this->strip[$name] !== null) {
+			return $this->strip[$name];
+		} else {
+			return $default;
+		}
 	}
 	
 	/**
@@ -62,21 +61,20 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	 */
 	public function text($name, $default = null) {
 		if (!isset($this->text[$name])) {
-			if (isset($this->raw[$name]) && $this->isValidEncoding($this->raw[$name])) {
-				$this->text[$name] = $this->stripControlCodes($this->raw[$name]);
-			} else {
-				return $default;
-			}
+			$utf8 = $this->utf8($name);
+			$this->text[$name] = $this->stripControlCodes($utf8);
 		}
-		return $this->text[$name];
-	}
-	
-	private function isValidEncoding($text) {
-		$encoding = 'UTF-8';
-		return mb_check_encoding($text, $encoding);
+		if ($this->text[$name] !== null) {
+			return $this->text[$name];
+		} else {
+			return $default;
+		}
 	}
 	
 	private function stripControlCodes($text) {
+		if ($text === null) {
+			return null;
+		}
 		$needles = array("\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
 		                 "\x08", /* \t */ /* \n */ "\x0b", "\x0c", /* \r */ "\x0e", "\x0f",
 		                 "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
@@ -84,12 +82,14 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		return str_replace($needles, '', $text);
 	}
 	
-	public function boolean($name, $default = false) {
-		$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-		if ($boolean === null) {
-			return $default;
+	public function utf8($name, $default = null) {
+		if (!isset($this->utf8[$name])) {
+			$this->utf8[$name] = isset($this->raw[$name]) && mb_check_encoding($this->raw[$name], 'UTF-8');
+		}
+		if ($this->utf8[$name]) {
+			return $this->raw[$name];
 		} else {
-			return $boolean;
+			return $default;
 		}
 	}
 	
@@ -98,6 +98,15 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 			return $this->raw[$name];
 		} else {
 			return $default;
+		}
+	}
+	
+	public function boolean($name, $default = false) {
+		$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+		if ($boolean === null) {
+			return $default;
+		} else {
+			return $boolean;
 		}
 	}
 	

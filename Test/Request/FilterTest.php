@@ -81,6 +81,28 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 	
+	/**
+	 * @dataProvider impliedFilterProvider
+	 */
+	public function testUtf8_Should_ReturnUtf8ValuesUnchanged($string, $get) {
+		$filter = new Request_Filter((array('foo'=>$string)));
+		$result = $filter->utf8('foo');
+		if (is_string($get)) {
+			$this->assertEquals($string, $result);
+		} else {
+			$this->assertNull($result);
+		}
+	}
+	
+	/**
+	 * @dataProvider impliedFilterProvider
+	 */
+	public function testBinary_Should_ReturnValueUnchanged($string) {
+		$filter = new Request_Filter((array('foo'=>$string)));
+		$result = $filter->binary('foo');
+		$this->assertEquals($string, $result);
+	}
+	
 	public function testUnsetOffset_Should_ReturnDefaultValue() {
 		$filter = new Request_Filter(array('invalid'=>"\xff"));
 		
@@ -89,6 +111,9 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('bar', $filter->text('foo', 'bar'));
 		$this->assertEquals("\xff", $filter->text('foo', "\xff"));    // default not be filtered
 		$this->assertEquals('bar', $filter->text('invalid', 'bar'));  // invalid text triggers default
+		
+		// utf8
+		$this->assertEquals('bar', $filter->utf8('foo', 'bar'));
 		
 		// binary
 		$this->assertEquals('bar', $filter->binary('foo', 'bar'));
@@ -119,14 +144,5 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 		$filter = new Request_Filter(array('foo'=>$string));
 		$result = $filter->boolean('foo', $default);
 		$this->assertEquals($expected, $result);
-	}
-	
-	/**
-	 * @dataProvider impliedFilterProvider
-	 */
-	public function testBinary_Should_ReturnValueUnchanged($string) {
-		$filter = new Request_Filter((array('foo'=>$string)));
-		$result = $filter->binary('foo');
-		$this->assertEquals($string, $result);
 	}
 }
