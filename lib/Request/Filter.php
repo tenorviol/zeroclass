@@ -20,21 +20,7 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	}
 	
 	public function offsetGet($name) {
-		if (!isset($this->filter[$name])) {
-			$raw = $this->raw[$name];
-			if (is_array($raw)) {
-				$filter = new Request_Filter($raw);
-			} else {
-				$filter = strval($raw);
-				if ($this->isValidEncoding($filter)) {
-					$filter = filter_var($filter, FILTER_SANITIZE_STRING);
-				} else {
-					$filter = null;
-				}
-			}
-			$this->filter[$name] = $filter;
-		}
-		return $this->filter[$name];
+		return $this->get($name);
 	}
 	
 	public function offsetSet($name, $value) {
@@ -52,17 +38,35 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		return new Request_Iterator($this, array_keys($this->raw));
 	}
 	
+	public function get($name, $default = null) {
+		if (!isset($this->filter[$name])) {
+			$raw = $this->raw[$name];
+			if (is_array($raw)) {
+				$filter = new Request_Filter($raw);
+			} else {
+				$filter = strval($raw);
+				if ($this->isValidEncoding($filter)) {
+					$filter = $this->stripControlCodes(filter_var($filter, FILTER_SANITIZE_STRING));
+				} else {
+					return $default;
+				}
+			}
+			$this->filter[$name] = $filter;
+		}
+		return $this->filter[$name];
+	}
+	
 	/**
 	 * Returns a character encoding validated version of the text.
 	 * Control codes should be eliminated?
 	 */
-	public function text($name) {
+	public function text($name, $default = null) {
 		if (!isset($this->text[$name])) {
-			$text = $this->raw[$name];
-			if (!$this->isValidEncoding($text)) {
-				$text = false;
+			if (isset($this->raw[$name]) && $this->isValidEncoding($this->raw[$name])) {
+				$this->text[$name] = $this->stripControlCodes($this->raw[$name]);
+			} else {
+				return $default;
 			}
-			$this->text[$name] = $text;
 		}
 		return $this->text[$name];
 	}
@@ -70,6 +74,14 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	private function isValidEncoding($text) {
 		$encoding = 'UTF-8';
 		return mb_check_encoding($text, $encoding);
+	}
+	
+	private function stripControlCodes($text) {
+		$needles = array("\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
+		                 "\x08", /* \t */ /* \n */ "\x0b", "\x0c", /* \r */ "\x0e", "\x0f",
+		                 "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
+		                 "\x18", "\x19", "\x1a", "\x1b", "\x1c", "\x1d", "\x1e", "\x1f");
+		return str_replace($needles, '', $text);
 	}
 	
 	public function binary($name, $default = null) {
