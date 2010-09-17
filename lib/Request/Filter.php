@@ -105,9 +105,10 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	
 	public function boolean($name, $default = null) {
 		if (!isset($this->boolean[$name])) {
-			$this->boolean[$name] = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+			$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+			$this->boolean[$name] = $boolean === null ? 0 : $boolean;
 		}
-		if ($this->boolean[$name] !== null) {
+		if ($this->boolean[$name] !== 0) {
 			return $this->boolean[$name];
 		} else {
 			return $default;
@@ -116,10 +117,9 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	
 	public function int($name, $default = null) {
 		if (!isset($this->int[$name])) {
-			$int = filter_var(@$this->raw[$name], FILTER_VALIDATE_INT);
-			$this->int[$name] = is_int($int) ? $int : null;
+			$this->int[$name] = filter_var(@$this->raw[$name], FILTER_VALIDATE_INT);
 		}
-		if ($this->int[$name] !== null) {
+		if ($this->int[$name] !== false) {
 			return $this->int[$name];
 		} else {
 			return $default;
