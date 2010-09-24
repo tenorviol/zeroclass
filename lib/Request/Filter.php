@@ -62,10 +62,10 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 				$this->strip[$name] = new Request_Filter($this->raw[$name]);
 			} else {
 				$text = $this->text($name);
-				$this->strip[$name] = $text === null ? null : filter_var($text, FILTER_SANITIZE_STRING);
+				$this->strip[$name] = $text === null ? false : filter_var($text, FILTER_SANITIZE_STRING);
 			}
 		}
-		if ($this->strip[$name] !== null) {
+		if ($this->strip[$name] !== false) {
 			return $this->strip[$name];
 		} else {
 			return $default;
@@ -82,10 +82,10 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	 */
 	public function text($name, $default = null) {
 		if (!isset($this->text[$name])) {
-			$utf8 = $this->utf8($name);
+			$utf8 = $this->utf8($name, false);
 			$this->text[$name] = $this->stripControlCodes($utf8);
 		}
-		if ($this->text[$name] !== null) {
+		if ($this->text[$name] !== false) {
 			return $this->text[$name];
 		} else {
 			return $default;
@@ -100,8 +100,8 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	 * @return string|null
 	 */
 	private function stripControlCodes($text) {
-		if ($text === null) {
-			return null;
+		if (!is_string($text)) {
+			return $text;
 		}
 		$needles = array("\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
 		                 "\x08", /* \t */ /* \n */ "\x0b", "\x0c", /* \r */ "\x0e", "\x0f",
