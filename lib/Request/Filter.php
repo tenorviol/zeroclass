@@ -183,6 +183,9 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	 * If the offset does not exist or the callable returns
 	 * either null or false, return the default.
 	 *
+	 * Example:
+	 *		$time = $filter->apply('strtotime', 'date', time());
+	 *
 	 * @param Callback $callable 
 	 * @param string $name 
 	 * @param mixed $default 
