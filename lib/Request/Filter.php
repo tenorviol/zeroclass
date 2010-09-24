@@ -35,7 +35,7 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		unset($this->raw[$name]);
 		unset($this->utf8[$name]);
 		unset($this->text[$name]);
-		unset($this->filter[$name]);
+		unset($this->strip[$name]);
 	}
 	
 	

@@ -212,4 +212,11 @@ class Request_FilterTest extends PHPUnit_Framework_TestCase {
 			$this->assertNull($result);
 		}
 	}
+	
+	public function testUnset() {
+		$filter = new Request_Filter(array('foo'=>'bar'));
+		$this->assertEquals('bar', $filter['foo']);
+		unset($filter['foo']);
+		$this->assertNull($filter['foo']);
+	}
 }
