@@ -155,10 +155,10 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 			array('-1', -1),
 			array('42', 42),
 			array('9223372036854775807', 9223372036854775807),
-			array('9223372036854775808', null),
-			array('8c', null),
-			array('', null),
-			array('012', null),  // no octals
+			array('9223372036854775808', 0),
+			array('8c', 0),
+			array('', 0),
+			array('012', 0),  // no octals
 		);
 	}
 	
@@ -179,8 +179,8 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 			array('-198748392748397234', -198748392748397234),
 			array('5.4e3', 5400),
 			array('1000.98', 1000.98),
-			array('1,000,000.0001', null),
-			array('', null),
+			array('1,000,000.0001', 0),
+			array('', 0),
 		);
 	}
 	
@@ -195,16 +195,21 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 	
 	public function dateTests() {
 		return array(
-			array('09/11/01')
+			array('09/11/01'),
+			array('some shit', false)
 		);
 	}
 	
 	/**
 	 * @dataProvider dateTests
 	 */
-	public function testStrtotime_Should_ReturnTimestamps($string, $valid=true) {
+	public function testApplyStrtotime_Should_ReturnTimestamps($string, $valid=true) {
 		$filter = new Request_Filter(array('foo'=>$string));
-		$result = $filter->strtotime('foo');
-		$this->assertEquals(strtotime($string), $result);
+		$result = $filter->apply('strtotime', 'foo');
+		if ($valid) {
+			$this->assertEquals(strtotime($string), $result);
+		} else {
+			$this->assertNull($result);
+		}
 	}
 }

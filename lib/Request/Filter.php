@@ -93,23 +93,30 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		return isset($this->raw[$name]) ? $this->raw[$name] : $default;
 	}
 	
-	public function boolean($name, $default = null) {
+	public function boolean($name, $default = false) {
 		$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 		return $boolean === null ? $default : $boolean;
 	}
 	
-	public function int($name, $default = null) {
+	public function int($name, $default = 0) {
 		$int = filter_var(@$this->raw[$name], FILTER_VALIDATE_INT);
 		return $int === false ? $default : $int;
 	}
 	
-	public function float($name, $default = null) {
+	public function float($name, $default = 0.0) {
 		$float = filter_var(@$this->raw[$name], FILTER_VALIDATE_FLOAT);
 		return $float === false ? $default : $float;
 	}
 	
-	public function strtotime($name, $default = false) {
-		$time = strtotime(@$this->raw[$name]);
-		return $time === false ? $default : $time;
+	public function apply($callable, $name, $default = null) {
+		$result = null;
+		if (isset($this->raw[$name])) {
+			$result = call_user_func($callable, $this->raw[$name]);
+		}
+		if ($result === null || $result === false) {
+			return $default;
+		} else {
+			return $result;
+		}
 	}
 }
