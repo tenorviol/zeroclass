@@ -11,8 +11,6 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	private $utf8 = array();
 	private $text = array();
 	private $strip = array();
-	private $boolean = array();
-	private $int = array();
 	
 	public function __construct(array $array) {
 		$this->raw = $array;
@@ -88,49 +86,30 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		if (!isset($this->utf8[$name])) {
 			$this->utf8[$name] = isset($this->raw[$name]) && mb_check_encoding($this->raw[$name], 'UTF-8');
 		}
-		if ($this->utf8[$name]) {
-			return $this->raw[$name];
-		} else {
-			return $default;
-		}
+		return $this->utf8[$name] ? $this->raw[$name] : $default;
 	}
 	
 	public function binary($name, $default = null) {
-		if (isset($this->raw[$name])) {
-			return $this->raw[$name];
-		} else {
-			return $default;
-		}
+		return isset($this->raw[$name]) ? $this->raw[$name] : $default;
 	}
 	
 	public function boolean($name, $default = null) {
-		if (!isset($this->boolean[$name])) {
-			$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-			$this->boolean[$name] = $boolean === null ? 0 : $boolean;
-		}
-		if ($this->boolean[$name] !== 0) {
-			return $this->boolean[$name];
-		} else {
-			return $default;
-		}
+		$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+		return $boolean === null ? $default : $boolean;
 	}
 	
 	public function int($name, $default = null) {
-		if (!isset($this->int[$name])) {
-			$this->int[$name] = filter_var(@$this->raw[$name], FILTER_VALIDATE_INT);
-		}
-		if ($this->int[$name] !== false) {
-			return $this->int[$name];
-		} else {
-			return $default;
-		}
+		$int = filter_var(@$this->raw[$name], FILTER_VALIDATE_INT);
+		return $int === false ? $default : $int;
 	}
 	
-	public function float($name, $default = 0.0) {
-		throw new Exception('Unimplemented');
+	public function float($name, $default = null) {
+		$float = filter_var(@$this->raw[$name], FILTER_VALIDATE_FLOAT);
+		return $float === false ? $default : $float;
 	}
 	
 	public function strtotime($name, $default = false) {
-		throw new Exception('Unimplemented');
+		$time = strtotime(@$this->raw[$name]);
+		return $time === false ? $default : $time;
 	}
 }

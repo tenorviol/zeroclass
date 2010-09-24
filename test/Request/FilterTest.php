@@ -154,7 +154,6 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 			array('1', 1),
 			array('-1', -1),
 			array('42', 42),
-			array('42', 42),
 			array('9223372036854775807', 9223372036854775807),
 			array('9223372036854775808', null),
 			array('8c', null),
@@ -170,5 +169,42 @@ class Test_Request_FilterTest extends PHPUnit_Framework_TestCase {
 		$filter = new Request_Filter(array('foo'=>$string));
 		$result = $filter->int('foo');
 		$this->assertEquals($expected, $result);
+	}
+	
+	public function floatTests() {
+		return array(
+			array('0', 0.0),
+			array('1', 1.0),
+			array('4.2', 4.2),
+			array('-198748392748397234', -198748392748397234),
+			array('5.4e3', 5400),
+			array('1000.98', 1000.98),
+			array('1,000,000.0001', null),
+			array('', null),
+		);
+	}
+	
+	/**
+	 * @dataProvider floatTests
+	 */
+	public function testFloat_Should_ReturnFloats($string, $expected) {
+		$filter = new Request_Filter(array('foo'=>$string));
+		$result = $filter->float('foo');
+		$this->assertEquals($expected, $result);
+	}
+	
+	public function dateTests() {
+		return array(
+			array('09/11/01')
+		);
+	}
+	
+	/**
+	 * @dataProvider dateTests
+	 */
+	public function testStrtotime_Should_ReturnTimestamps($string, $valid=true) {
+		$filter = new Request_Filter(array('foo'=>$string));
+		$result = $filter->strtotime('foo');
+		$this->assertEquals(strtotime($string), $result);
 	}
 }
