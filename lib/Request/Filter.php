@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Filter stuff coming from a request array (i.e. $_GET or $_POST).
+ * Filter data coming from a request array (i.e. $_GET or $_POST).
  * These validations are exclusively UTF-8.
  * TODO: alternate character encodings?
  */
@@ -15,6 +15,8 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	public function __construct(array $array) {
 		$this->raw = $array;
 	}
+	
+	/*** ArrayAccess interface ***/
 	
 	public function offsetExists($name) {
 		return isset($this->raw[$name]);
@@ -31,14 +33,29 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	
 	public function offsetUnset($name) {
 		unset($this->raw[$name]);
+		unset($this->utf8[$name]);
 		unset($this->text[$name]);
 		unset($this->filter[$name]);
 	}
+	
+	
+	/*** IteratorAggregate interface ***/
 	
 	public function getIterator() {
 		return new Request_Iterator($this, array_keys($this->raw));
 	}
 	
+	
+	/**
+	 * Return the array offset, stripped of all tags and
+	 * exotic control characters, and verified as valid utf8.
+	 * If the array offset does not exist or its value does
+	 * not pass muster, the default value is returned.
+	 *
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return string|mixed
+	 */
 	public function get($name, $default = null) {
 		if (!isset($this->strip[$name])) {
 			if (is_array($this->raw[$name])) {
@@ -56,8 +73,12 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	}
 	
 	/**
-	 * Returns a character encoding validated version of the text.
-	 * Control codes should be eliminated?
+	 * Return the array offset, stripped of exotic control
+	 * characters and verified as utf8.
+	 *
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return string|mixed
 	 */
 	public function text($name, $default = null) {
 		if (!isset($this->text[$name])) {
@@ -71,6 +92,13 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		}
 	}
 	
+	/**
+	 * Remove all control codes, with the exceptions of tab,
+	 * newline and carriage return.
+	 *
+	 * @param string|null $text 
+	 * @return string|null
+	 */
 	private function stripControlCodes($text) {
 		if ($text === null) {
 			return null;
@@ -82,6 +110,14 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		return str_replace($needles, '', $text);
 	}
 	
+	/**
+	 * Return the array offset if it contains valid utf8.
+	 * Otherwise, return the default.
+	 *
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return string|mixed
+	 */
 	public function utf8($name, $default = null) {
 		if (!isset($this->utf8[$name])) {
 			$this->utf8[$name] = isset($this->raw[$name]) && mb_check_encoding($this->raw[$name], 'UTF-8');
@@ -89,28 +125,73 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 		return $this->utf8[$name] ? $this->raw[$name] : $default;
 	}
 	
+	/**
+	 * Return the array offset as is, if it exists.
+	 * Otherwise, return the default.
+	 *
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return string|mixed
+	 */
 	public function binary($name, $default = null) {
 		return isset($this->raw[$name]) ? $this->raw[$name] : $default;
 	}
 	
+	/**
+	 * Return a boolean based on the value at the offset.
+	 * Otherwise, return default.
+	 * Valid values for true: '1', 'true', 'on', 'yes'.
+	 * Valid values for false: '0', 'false', 'off', 'no', ''.
+	 *
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return boolean|mixed
+	 */
 	public function boolean($name, $default = false) {
 		$boolean = filter_var(@$this->raw[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 		return $boolean === null ? $default : $boolean;
 	}
 	
+	/**
+	 * Return an int based on the value at the offset.
+	 * Otherwise, return default.
+	 *
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return int|mixed
+	 */
 	public function int($name, $default = 0) {
 		$int = filter_var(@$this->raw[$name], FILTER_VALIDATE_INT);
 		return $int === false ? $default : $int;
 	}
 	
+	/**
+	 * Return a float based on the value at the offset.
+	 * Otherwise, return default.
+	 *
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return float|mixed
+	 */
 	public function float($name, $default = 0.0) {
 		$float = filter_var(@$this->raw[$name], FILTER_VALIDATE_FLOAT);
 		return $float === false ? $default : $float;
 	}
 	
+	/**
+	 * Apply a callable function to the value at offset.
+	 * If the offset does not exist or the callable returns
+	 * either null or false, return the default.
+	 *
+	 * @param Callback $callable 
+	 * @param string $name 
+	 * @param mixed $default 
+	 * @return mixed
+	 */
 	public function apply($callable, $name, $default = null) {
+		$utf8 = $this->utf8($name);
 		$result = null;
-		if (isset($this->raw[$name])) {
+		if ($utf8 !== null) {
 			$result = call_user_func($callable, $this->raw[$name]);
 		}
 		if ($result === null || $result === false) {
