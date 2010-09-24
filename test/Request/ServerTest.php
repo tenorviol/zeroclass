@@ -1,11 +1,8 @@
 <?php
 
-require_once __DIR__.'/../base.php';
+require_once 'lib/autoload.php';
 
-/**
- * Testing the Request_Server class.
- */
-class Test_Request_ServerTest extends PHPUnit_Framework_TestCase {
+class Request_ServerTest extends PHPUnit_Framework_TestCase {
 	
 	public function pathProvider() {
 		return array(

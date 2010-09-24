@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__.'/../base.php';
+require_once 'lib/autoload.php';
 
-class Test_Request_IteratorTest extends PHPUnit_Framework_TestCase {
+class Request_IteratorTest extends PHPUnit_Framework_TestCase {
 	public function test() {
 		
 		$array = array(

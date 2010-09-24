@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__.'/../base.php';
+require_once 'lib/autoload.php';
 
-class Test_Response_Template extends PHPUnit_Framework_TestCase {
+class Response_TemplateTest extends PHPUnit_Framework_TestCase {
 	
 	public function testDisplayShouldWriteToOutputBuffer() {
 		$template = new Response_Template(__DIR__.'/template/foo.php');
