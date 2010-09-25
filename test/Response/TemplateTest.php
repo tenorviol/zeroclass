@@ -4,14 +4,14 @@ require_once 'lib/autoload.php';
 
 class Response_TemplateTest extends PHPUnit_Framework_TestCase {
 	
-	public function testDisplayShouldWriteToOutputBuffer() {
-		$template = new Response_Template(__DIR__.'/template/foo.php');
-		$vars = array('rand'=>mt_rand());
+	public function testDisplay_Should_WriteToOutputBuffer() {
+		$template = new Response_Template('test/Response/template/simple/foo.php');
+		
 		ob_start();
-		$template->display($vars);
+		$template->display();
 		$output = ob_get_contents();
 		ob_end_clean();
 		
-		$this->assertEquals("foo\n$vars[rand]", $output);
+		$this->assertEquals("foo\n", $output);
 	}
 }

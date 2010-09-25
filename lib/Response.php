@@ -6,7 +6,12 @@ abstract class Response {
 	
 	public function render(array $vars = array()) {
 		ob_start();
-		$this->display($vars);
+		try {
+			$this->display($vars);
+		} catch (Exception $e) {
+			ob_end_clean();
+			throw $e;
+		}
 		$render = ob_get_contents();
 		ob_end_clean();
 		return $render;
