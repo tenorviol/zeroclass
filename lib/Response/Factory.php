@@ -3,9 +3,11 @@
 class Response_Factory {
 	
 	private $template_dir;
+	private $suffix;
 	
-	public function __construct($template_dir) {
+	public function __construct($template_dir, $suffix = '.php') {
 		$this->template_dir = $template_dir;
+		$this->suffix = $suffix;
 	}
 	
 	public function realTemplatePath($path) {
@@ -14,7 +16,7 @@ class Response_Factory {
 			$realpath = realpath($realpath);
 			$realpath .= '/index';
 		}
-		$realpath .= '.php';
+		$realpath .= $this->suffix;
 		if (!is_file($realpath)) {
 			throw new NotFoundException("template file '$path'");
 		}
