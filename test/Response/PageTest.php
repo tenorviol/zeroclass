@@ -33,14 +33,13 @@ class Response_PageTest extends PHPUnit_Framework_TestCase {
 	
 	public function testRenderingInsestuousTemplates() {
 		$factory = new Response_Factory('test/Response/template/insestuous');
-		$factory->default_header = '/header';
-		$factory->default_footer = '/footer';
 		
 		$page = $factory->createPage('/page');
 		
-		$result = $page->render();
+		// see template/insestuous/* for examples on modifying the vars objects
+		$result = $page->render(array('css'=>new stdClass()));
 		
-		$this->assertEquals("MyPage\nMyPage content...\nCopyright &copy; 2010\n", $result);
+		$this->assertEquals("MyPage\n/incestuous.css\nMyPage content...\nCopyright &copy; 2010", $result);
 	}
 	
 	/**
