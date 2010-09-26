@@ -4,21 +4,26 @@ class Response_Factory {
 	
 	private $template_dir;
 	private $suffix;
+	private $index;
 	
-	public function __construct($template_dir, $suffix = '.php') {
+	public $default_header = null;
+	public $default_footer = null;
+	
+	public function __construct($template_dir, $suffix = '.php', $index = '/index') {
 		$this->template_dir = $template_dir;
 		$this->suffix = $suffix;
+		$this->index = $index;
 	}
 	
 	public function realTemplatePath($path) {
 		$realpath = $this->template_dir.$path;
 		if (is_dir($realpath)) {
 			$realpath = realpath($realpath);
-			$realpath .= '/index';
+			$realpath .= $this->index;
 		}
 		$realpath .= $this->suffix;
 		if (!is_file($realpath)) {
-			throw new NotFoundException("template file '$path'");
+			throw new InvalidArgumentException("No template file found at '$path'. realpath=$realpath");
 		}
 		return $realpath;
 	}
@@ -30,6 +35,8 @@ class Response_Factory {
 	
 	public function createPage($path) {
 		$page = new Response_Page($path, $this);
+		$page->header = $this->default_header;
+		$page->footer = $this->default_footer;
 		return $page;
 	}
 }

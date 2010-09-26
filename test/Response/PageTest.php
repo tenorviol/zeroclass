@@ -31,6 +31,18 @@ class Response_PageTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals("HEADER\nfoo\nFOOTER\n", $result);
 	}
 	
+	public function testRenderingInsestuousTemplates() {
+		$factory = new Response_Factory('test/Response/template/insestuous');
+		$factory->default_header = '/header';
+		$factory->default_footer = '/footer';
+		
+		$page = $factory->createPage('/page');
+		
+		$result = $page->render();
+		
+		$this->assertEquals("MyPage\nMyPage content...\nCopyright &copy; 2010\n", $result);
+	}
+	
 	/**
 	 * @expectedException UnexpectedValueException
 	 */
