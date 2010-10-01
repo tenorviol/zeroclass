@@ -1,17 +1,17 @@
 <?php
 
 class Request {
-	public static $COOKIE;
-	public static $ENV;
-	public static $GET;
-	public static $POST;
-	public static $REQUEST;
-	public static $SERVER;
+	public static $_COOKIE;
+	public static $_ENV;
+	public static $_GET;
+	public static $_POST;
+	public static $_REQUEST;
+	public static $_SERVER;
 }
 
-Request::$COOKIE = new Request_Filter($_COOKIE);
-Request::$ENV = new Request_Filter($_ENV);
-Request::$GET = new Request_Filter($_GET);
-Request::$POST = new Request_Filter($_POST);
-Request::$REQUEST = new Request_Filter($_REQUEST);
-Request::$SERVER = new Request_Server($_SERVER);
+Request::$_COOKIE = new Request_Filter($_COOKIE);
+Request::$_ENV = new Request_Filter($_ENV);
+Request::$_GET = new Request_Filter($_GET);
+Request::$_POST = new Request_Filter($_POST);
+Request::$_REQUEST = new Request_Filter($_REQUEST);
+Request::$_SERVER = new Request_Server($_SERVER);
