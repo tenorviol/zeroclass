@@ -12,11 +12,11 @@ class RequestTest extends PHPUnit_Framework_TestCase {
 		$_REQUEST['foo'] = 'bar';
 		$_SERVER['foo'] = 'bar';
 		
-		$this->assertEquals($_GET['foo'], Request::$COOKIE->utf8('foo'));
-		$this->assertEquals($_GET['foo'], Request::$ENV->utf8('foo'));
-		$this->assertEquals($_GET['foo'], Request::$GET->utf8('foo'));
-		$this->assertEquals($_GET['foo'], Request::$POST->utf8('foo'));
-		$this->assertEquals($_GET['foo'], Request::$REQUEST->utf8('foo'));
-		$this->assertEquals($_GET['foo'], Request::$SERVER->utf8('foo'));
+		$this->assertEquals($_GET['foo'], Request::$_COOKIE->utf8('foo'));
+		$this->assertEquals($_GET['foo'], Request::$_ENV->utf8('foo'));
+		$this->assertEquals($_GET['foo'], Request::$_GET->utf8('foo'));
+		$this->assertEquals($_GET['foo'], Request::$_POST->utf8('foo'));
+		$this->assertEquals($_GET['foo'], Request::$_REQUEST->utf8('foo'));
+		$this->assertEquals($_GET['foo'], Request::$_SERVER->utf8('foo'));
 	}
 }
