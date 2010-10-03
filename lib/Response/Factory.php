@@ -39,4 +39,9 @@ class Response_Factory {
 		$page->footer = $this->default_footer;
 		return $page;
 	}
+	
+	public function displayPage($path, $vars = array()) {
+		$page = $this->createPage($path);
+		$page->display($vars);
+	}
 }
