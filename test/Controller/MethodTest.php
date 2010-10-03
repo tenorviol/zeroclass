@@ -35,6 +35,11 @@ class Controller_MethodTest extends PHPUnit_Framework_TestCase {
 }
 
 class TestController extends Controller_Method {
+	
+	public function __construct() {
+		
+	}
+	
 	protected function get(array $parts) {
 		echo __FUNCTION__.' '.implode('|', $parts);
 	}

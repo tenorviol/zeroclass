@@ -2,15 +2,12 @@
 
 abstract class Controller_Method implements Controller {
 	
-	private $path;
-	
-	public function __construct($path = null) {
-		$this->path = $path === null ? $_SERVER['REQUEST_URI'] : $path;
-	}
+	public $path = null;
 	
 	public function control() {
+		$path = $this->path === null ? $_SERVER['REQUEST_URI'] : $this->path;
 		$q = strpos($this->path, '?');
-		$path = $q === false ? $this->path : substr($this->path, 0, $q);
+		$path = $q === false ? $path : substr($path, 0, $q);
 		$path = preg_replace('#^/+#', '', $path);
 		$parts = preg_split('#/+#', $path);
 		$this->call($parts);
