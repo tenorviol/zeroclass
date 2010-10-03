@@ -219,4 +219,24 @@ class Request_FilterTest extends PHPUnit_Framework_TestCase {
 		unset($filter['foo']);
 		$this->assertNull($filter['foo']);
 	}
+	
+	public function emailTests() {
+		return array(
+			array('foo@foo.com', true),
+			array('not an email', false)
+		);
+	}
+	
+	/**
+	 * @dataProvider emailTests
+	 */
+	public function testEmail_Should_ReturnValidEmails($email, $valid) {
+		$filter = new Request_Filter(array('email'=>$email));
+		$result = $filter->email('email');
+		if ($valid) {
+			$this->assertEquals($email, $result);
+		} else {
+			$this->assertNull($result);
+		}
+	}
 }

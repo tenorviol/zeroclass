@@ -58,7 +58,7 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	 */
 	public function get($name, $default = null) {
 		if (!isset($this->strip[$name])) {
-			if (is_array($this->raw[$name])) {
+			if (is_array(@$this->raw[$name])) {
 				$this->strip[$name] = new Request_Filter($this->raw[$name]);
 			} else {
 				$text = $this->text($name);
@@ -176,6 +176,11 @@ class Request_Filter implements ArrayAccess, IteratorAggregate {
 	public function float($name, $default = 0.0) {
 		$float = filter_var(@$this->raw[$name], FILTER_VALIDATE_FLOAT);
 		return $float === false ? $default : $float;
+	}
+	
+	public function email($name, $default = null) {
+		$email = filter_var(@$this->raw[$name], FILTER_VALIDATE_EMAIL);
+		return $email === false ? $default : $email;
 	}
 	
 	/**
