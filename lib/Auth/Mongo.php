@@ -8,12 +8,19 @@ class Auth_Mongo implements Auth {
 		$this->users = $users;
 	}
 	
-	public function addUser($user_id, $password) {
+	public function setPassword($user_id, $password) {
 		$hash = $this->hashPassword($password);
-		$this->users->insert(array('_id'=>$user_id, 'passhash'=>$hash));
+		$result = $this->users->update(
+			array('_id'=>$user_id),
+			array('_id'=>$user_id, 'passhash'=>$hash),
+			array('upsert'=>true, 'safe'=>true)
+		);
+		if ($result['n'] != 1) {
+			throw new Auth_Exception();
+		}
 	}
 	
-	public function deleteUser($user_id) {
+	public function deletePassword($user_id) {
 		$this->users->remove(array('_id'=>$user_id));
 	}
 	
@@ -33,18 +40,6 @@ class Auth_Mongo implements Auth {
 		}
 		$hash = $this->hashPassword($password, $user['passhash']);
 		if ($user['passhash'] != $hash) {
-			throw new Auth_Exception();
-		}
-	}
-	
-	public function changePassword($user_id, $password) {
-		$hash = $this->hashPassword($password);
-		$result = $this->users->update(
-			array('_id'=>$user_id),
-			array('passhash'=>$hash),
-			array('upsert'=>false, 'safe'=>true)
-		);
-		if (!$result['updatedExisting']) {
 			throw new Auth_Exception();
 		}
 	}

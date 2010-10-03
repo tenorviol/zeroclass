@@ -16,8 +16,8 @@ class Auth_MongoTest extends PHPUnit_Framework_TestCase {
 	public function test() {
 		$auth = new Auth_Mongo($this->collection());
 		
-		$auth->addUser(1, 'foo');
-		$auth->addUser(2, 'bar');
+		$auth->setPassword(1, 'foo');
+		$auth->setPassword(2, 'bar');
 		
 		$auth->login(1, 'foo');
 		$this->assertEquals(1, $auth->userId());
@@ -33,7 +33,7 @@ class Auth_MongoTest extends PHPUnit_Framework_TestCase {
 		}
 		$this->assertType('Auth_Exception', $e);
 		
-		$auth->deleteUser(1);
+		$auth->deletePassword(1);
 		
 		try {
 			$e = null;
@@ -49,16 +49,9 @@ class Auth_MongoTest extends PHPUnit_Framework_TestCase {
 		$auth->logout();
 		$this->assertNull($auth->userId());
 		
-		$auth->changePassword(2, 'fubar');
+		$auth->setPassword(2, 'fubar');
 		
 		$auth->login(2, 'fubar');
 		$this->assertEquals(2, $auth->userId());
-		
-		try {
-			$auth->changePassword(1, 'this user does not exist');
-		} catch (Auth_Exception $e) {
-			return;
-		}
-		$this->fail();
 	}
 }
