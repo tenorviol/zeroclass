@@ -24,12 +24,7 @@
 class Random_DevUrandom {
 	
 	public function int() {
-		$handle = fopen('/dev/urandom', 'r');
-		if (!$handle) {
-			throw new Exception('Unable to open /dev/urandom');
-		}
-		$bytes = fread($handle, PHP_INT_SIZE);
-		fclose($handle);
+		$bytes = $this->string(PHP_INT_SIZE);
 		$int = 0;
 		for ($i = 0; $i < PHP_INT_SIZE; $i++) {
 			$int = $int << 8;
@@ -38,7 +33,16 @@ class Random_DevUrandom {
 		return $int;
 	}
 	
-	public function string($size, $set) {
-		
+	public function string($size, $set = null) {
+		$handle = fopen('/dev/urandom', 'r');
+		if (!$handle) {
+			throw new Exception('Unable to open /dev/urandom');
+		}
+		$string = fread($handle, $size);
+		fclose($handle);
+		if ($set !== null) {
+			
+		}
+		return $string;
 	}
 }
