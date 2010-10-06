@@ -34,6 +34,9 @@ class Controller_Mapper implements Controller {
 		case 'POST':
 			$result = $this->post();
 			break;
+		case 'PUT':
+			$result = $this->put();
+			break;
 		case 'DELETE':
 			$result = $this->delete();
 			break;
@@ -50,6 +53,12 @@ class Controller_Mapper implements Controller {
 	
 	protected function post() {
 		$request = new Request_Filter($_POST);
+		return $this->mapper->requestPost($request);
+	}
+	
+	protected function put() {
+		parse_str(file_get_contents('php://input'), $_PUT);
+		$request = new Request_Filter($_PUT);
 		return $this->mapper->requestPost($request);
 	}
 	
