@@ -223,7 +223,14 @@ class Request_FilterTest extends PHPUnit_Framework_TestCase {
 	public function emailTests() {
 		return array(
 			array('foo@foo.com', true),
-			array('not an email', false)
+			array('not an email', false),
+			array('@noone.com', false),
+			array('nowhere@', false),
+			array("\xffbadchar@chars.com", false),
+			array('Pelé@example.com', false),  // unicode not supported... yet
+			array('"Crios Johnson"@example.com', false),
+			array('"Crios+Johnson"@example.com', true),
+			array('"Crios+Johnson"@127.0.0.1', false),  // no?
 		);
 	}
 	
