@@ -1,6 +1,5 @@
 <?php
 /**
- * Zeroclass library - http://github.com/tenorviol/zeroclass
  * Copyright (c) 2010 Christopher Johnson
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,9 +21,29 @@
  * THE SOFTWARE. 
  */
 
-interface Request_Mapper {
+class Controller_Request_Mapper implements Controller {
 	
-	public function requestGet(Request_Filter $request);
+	private $mapper;
 	
-	public function requestPost(Request_Filter $request);
+	public function __construct(Request_Mapper $mapper) {
+		$this->mapper = $mapper;
+	}
+	
+	public function control() {
+		if ('POST' == $_SERVER['REQUEST_METHOD']) {
+			$this->post();
+		} else {
+			$this->get();
+		}
+	}
+	
+	protected function get() {
+		$request = new Request_Filter($_GET);
+		$this->mapper->requestGet($request);
+	}
+	
+	protected function post() {
+		$request = new Request_Filter($_POST);
+		$this->mapper->requestPost($request);
+	}
 }

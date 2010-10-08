@@ -21,54 +21,9 @@
  * THE SOFTWARE. 
  */
 
-class Controller_Mapper implements Controller {
+interface Request_RestMapper extends Request_Mapper {
 	
-	private $mapper;
+	public function requestDelete(Request_Filter $request);
 	
-	public function __construct(Request_Mapper $mapper) {
-		$this->mapper = $mapper;
-	}
-	
-	public function control() {
-		switch ($_SERVER['REQUEST_METHOD']) {
-		case 'POST':
-			$result = $this->post();
-			break;
-		case 'PUT':
-			$result = $this->put();
-			break;
-		case 'DELETE':
-			$result = $this->delete();
-			break;
-		default:
-			$result = $this->get();
-		}
-		$this->response($result);
-	}
-	
-	protected function get() {
-		$request = new Request_Filter($_GET);
-		return $this->mapper->requestGet($request);
-	}
-	
-	protected function post() {
-		$request = new Request_Filter($_POST);
-		return $this->mapper->requestPost($request);
-	}
-	
-	protected function put() {
-		parse_str(file_get_contents('php://input'), $_PUT);
-		$request = new Request_Filter($_PUT);
-		return $this->mapper->requestPost($request);
-	}
-	
-	protected function delete() {
-		parse_str(file_get_contents('php://input'), $_DELETE);
-		$request = new Request_Filter($_DELETE);
-		return $this->mapper->requestDelete($request);
-	}
-	
-	protected function response($result) {
-		echo json_encode($result);
-	}
+	public function requestPut(Request_Filter $request);
 }
