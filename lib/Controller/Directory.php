@@ -31,25 +31,25 @@ class Controller_Directory extends Controller_PathMethod {
 	
 	public function __construct(Container $directory, $default = 'default') {
 		$this->directory = $directory;
-		$this->default = $default;
+		$this->default = strtolower($default);
 	}
 	
 	protected function executePathMethod($path) {
 		preg_match('#^/*([^/?]*)(.*)$#', $path, $matches);
-		$directory = $matches[1];
+		$directory = strtolower($matches[1]);
 		$remainder = $matches[2];
+		$controller = null;
 		
 		if (!$directory) {
-			if (!$this->default) {
-				throw new NotFoundException('No default directory');
-			}
 			$directory = $this->default;
 		}
 		try {
 			$controller = $this->directory->$directory;
 		} catch (NotFoundException $e) {
-			$directory = $this->default;
-			$controller = $this->directory->$directory;
+			if ($directory != $this->default) {
+				$directory = $this->default;
+				$controller = $this->directory->$directory;
+			}
 		}
 		if (!$controller instanceof Controller) {
 			throw new NotFoundException("No controller, '$directory', could be found");
