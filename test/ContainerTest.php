@@ -4,7 +4,7 @@ require_once 'lib/autoload.php';
 
 class ContainerTest extends PHPUnit_Framework_TestCase {
 	
-	public function testGetShouldReturnPremeditatedOrManufacturedData() {
+	public function testPropertyReturnsPremadeAndManufacturedData() {
 		$container = new TestContainer();
 		
 		// simple set and retrieve
@@ -34,10 +34,9 @@ class ContainerTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * This is more implementation detail than feature.
 	 * @expectedException Exception
 	 */
-	public function testUndefinedMethodShouldThrowException() {
+	public function testUndefinedMethodThrowsException() {
 		$container = new Container();
 		$container->jacob();
 	}
