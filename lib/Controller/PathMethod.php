@@ -24,20 +24,26 @@
  * THE SOFTWARE. 
  */
 
-abstract class Controller_Method implements Controller {
+class Controller_PathMethod implements Controller {
 	
-	public $path = null;
+	const PREFIX = 'call';
+	private $path = null;
+	
+	public function setPath($path) {
+		$this->path = $path;
+	}
 	
 	public function control() {
 		$path = $this->path === null ? $_SERVER['REQUEST_URI'] : $this->path;
+		$this->executePathMethod($path);
+	}
+	
+	protected function executePathMethod($path) {
 		$q = strpos($this->path, '?');
 		$path = $q === false ? $path : substr($path, 0, $q);
 		$path = preg_replace('#^/+#', '', $path);
 		$parts = preg_split('#/+#', $path);
-		$this->call($parts);
-	}
-	
-	protected function call(array $parts) {
+		
 		$words = array();
 		foreach ($parts as $part) {
 			if ($part == '') continue;
@@ -45,15 +51,16 @@ abstract class Controller_Method implements Controller {
 			$bits = explode('.', $part);
 			$words = array_merge($words, $bits);
 		}
-		while (true) {
-			$method = 'get'.implode($words);
+		
+		do {
+			$method = static::PREFIX.implode($words);
 			if (method_exists($this, $method)) {
 				$this->$method($parts);
 				return;
 			}
 			array_pop($words);
-		}
+		} while (isset($words[0]));
+		
+		throw new NotFoundException();
 	}
-	
-	protected abstract function get(array $parts);
 }

@@ -12,7 +12,7 @@ class Controller_DirectoryTest extends PHPUnit_Framework_TestCase {
 			array('/barfoo', 'barfoo'),
 			array('/subdir/alex', 'alex'),
 			array('/subdir/subdir/Leila', 'Leila'),
-			array('/', '')
+			array('/', 'lastresort')
 		);
 	}
 	
@@ -22,7 +22,7 @@ class Controller_DirectoryTest extends PHPUnit_Framework_TestCase {
 	public function test($request_uri, $expected) {
 		$_SERVER['REQUEST_URI'] = $request_uri;
 		
-		$controller = new TestDir();
+		$controller = new Controller_Directory(new DirContainer(), 'lastresort');
 		
 		ob_start();
 		$controller->control();
@@ -33,16 +33,16 @@ class Controller_DirectoryTest extends PHPUnit_Framework_TestCase {
 	}
 }
 
-class TestDir extends Controller_Directory {
-	protected function direct($directory, $remainder) {
-		if ($directory == 'subdir') {
-			$controller = new TestDir($remainder);
+class DirContainer extends Container {
+	public function getInstance($property) {
+		if ($property == 'subdir') {
+			$controller = new Controller_Directory($this);
 		} else {
-			$controller = new LambdaController(function() use ($directory) {
-				echo $directory;
+			$controller = new LambdaController(function() use ($property) {
+				echo $property;
 			});
 		}
-		$controller->control();
+		return $controller;
 	}
 }
 

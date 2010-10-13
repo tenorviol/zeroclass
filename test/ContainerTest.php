@@ -17,14 +17,18 @@ class ContainerTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(isset($container->test));
 	}
 	
-	public function testPropertyWithoutFactoryShouldReturnNull() {
-		error_reporting(0);
+	/**
+	 * @expectedException NotFoundException
+	 */
+	public function testPropertyWithoutFactoryThrowsNotFoundException() {
 		$container = new Container();
-		$this->assertNull($container->john);
+		$container->john;
 	}
 	
+	/**
+	 * @expectedException NotFoundException
+	 */
 	public function testInstancePropertyShouldNotTriggerInfiniteLoop() {
-		error_reporting(0);
 		$container = new Container();
 		$this->assertNull($container->instance);
 	}

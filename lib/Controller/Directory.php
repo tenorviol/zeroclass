@@ -24,20 +24,39 @@
  * THE SOFTWARE. 
  */
 
-abstract class Controller_Directory implements Controller {
+class Controller_Directory extends Controller_PathMethod {
 	
-	private $path;
+	private $directory;
+	private $default;
 	
-	public function __construct($path = null) {
-		$this->path = $path === null ? $_SERVER['REQUEST_URI'] : $path;
+	public function __construct(Container $directory, $default = 'default') {
+		$this->directory = $directory;
+		$this->default = $default;
 	}
 	
-	public function control() {
-		preg_match('/^\\/*([^\\/?]*)(.*)$/', $this->path, $matches);
+	protected function executePathMethod($path) {
+		preg_match('#^/*([^/?]*)(.*)$#', $path, $matches);
 		$directory = $matches[1];
 		$remainder = $matches[2];
-		$this->direct($directory, $remainder);
+		
+		if (!$directory) {
+			if (!$this->default) {
+				throw new NotFoundException('No default directory');
+			}
+			$directory = $this->default;
+		}
+		try {
+			$controller = $this->directory->$directory;
+		} catch (NotFoundException $e) {
+			$directory = $this->default;
+			$controller = $this->directory->$directory;
+		}
+		if (!$controller instanceof Controller) {
+			throw new NotFoundException("No controller, '$directory', could be found");
+		}
+		if ($controller instanceof Controller_PathMethod) {
+			$controller->setPath($remainder);
+		}
+		$controller->control();
 	}
-	
-	protected abstract function direct($directory, $remainder);
 }

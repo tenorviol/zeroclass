@@ -34,7 +34,9 @@ class Controller_MethodTest extends PHPUnit_Framework_TestCase {
 	}
 }
 
-class TestController extends Controller_Method {
+class TestController extends Controller_PathMethod {
+	
+	const PREFIX = 'get';
 	
 	public function __construct() {
 		

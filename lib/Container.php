@@ -94,13 +94,8 @@ class Container {
 	 * @return mixed
 	 */
 	public function __get($property) {
-		try {
-			$this->$property = $this->createInstance($property);
-			return $this->$property;
-		} catch (Exception $e) {
-			trigger_error("Reference to unset property, '$property'", E_USER_NOTICE);
-			return null;
-		}
+		$this->$property = $this->getInstance($property);
+		return $this->$property;
 	}
 	
 	/**
@@ -114,7 +109,7 @@ class Container {
 	 * @throws Exception
 	 */
 	public function __call($method, $arguments) {
-		throw new ErrorException('Call to undefined method '.get_class($this)."::$method()", E_ERROR);
+		throw new NotFoundException('Call to undefined method '.get_class($this)."::$method()", E_ERROR);
 	}
 	
 	/**
@@ -125,7 +120,7 @@ class Container {
 	 * 
 	 * @param string $property
 	 */
-	public function createInstance($property) {
+	public function getInstance($property) {
 		$method = 'create'.ucfirst($property);
 		return $this->$method();
 	}
