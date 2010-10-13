@@ -109,7 +109,7 @@ class Container {
 	 * @throws Exception
 	 */
 	public function __call($method, $arguments) {
-		throw new NotFoundException('Call to undefined method '.get_class($this)."::$method()", E_ERROR);
+		throw new NotFoundException('Undefined method '.get_class($this)."::$method");
 	}
 	
 	/**
