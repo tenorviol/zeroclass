@@ -7,11 +7,11 @@ class Controller_DirectoryTest extends PHPUnit_Framework_TestCase {
 	public function requests() {
 		return array(
 			array('/foo/', 'foo'),
-			array('/FOO/bar/', 'FOO'),
+			array('/FOO/bar/', 'foo'),
 			array('/bar', 'bar'),
 			array('/barfoo', 'barfoo'),
 			array('/subdir/alex', 'alex'),
-			array('/subdir/subdir/Leila', 'Leila'),
+			array('/subdir/subdir/Leila', 'leila'),
 			array('/', 'lastresort')
 		);
 	}
