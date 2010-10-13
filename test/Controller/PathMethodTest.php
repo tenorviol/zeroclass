@@ -2,18 +2,18 @@
 
 require_once 'lib/autoload.php';
 
-class Controller_MethodTest extends PHPUnit_Framework_TestCase {
+class Controller_PathMethodTest extends PHPUnit_Framework_TestCase {
 	
 	public function requests() {
 		return array(
 			array('/foo/', 'getFoo foo|'),
 			array('/foo/other/crap/here', 'getFoo foo|other|crap|here'),
-			array('/FOO/bar/', 'getFooBar FOO|bar|'),
-			array('/FOO/bar.html', 'getFooBar FOO|bar.html'),
-			array('/foo.json', 'getFooJson foo.json'),
+			array('/FOO/bar/', 'getFoo_Bar FOO|bar|'),
+			array('/FOO/bar.html', 'getFoo_Bar FOO|bar.html'),
+			array('/foo.json', 'getFoo_Json foo.json'),
 			array('/', 'get '),
 			array('', 'get '),
-			array('foo/bar/2112', 'getFooBar foo|bar|2112'),
+			array('foo/bar/2112', 'getFoo_Bar foo|bar|2112'),
 		);
 	}
 	
@@ -50,11 +50,11 @@ class TestController extends Controller_PathMethod {
 		echo __FUNCTION__.' '.implode('|', $parts);
 	}
 	
-	protected function getFooJson(array $parts) {
+	protected function getFoo_Json(array $parts) {
 		echo __FUNCTION__.' '.implode('|', $parts);
 	}
 	
-	protected function getFooBar(array $parts) {
+	protected function getFoo_Bar(array $parts) {
 		echo __FUNCTION__.' '.implode('|', $parts);
 	}
 }
