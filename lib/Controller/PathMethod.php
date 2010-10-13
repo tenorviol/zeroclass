@@ -24,6 +24,11 @@
  * THE SOFTWARE. 
  */
 
+/**
+ * Calls a class method based on the path.
+ *
+ * I.e. '/widget/gremlin' calls ::callWidget_Gremlin
+ */
 class Controller_PathMethod implements Controller {
 	
 	const PREFIX = 'call';
@@ -53,7 +58,7 @@ class Controller_PathMethod implements Controller {
 		}
 		
 		do {
-			$method = static::PREFIX.implode($words);
+			$method = static::PREFIX.implode('_', $words);
 			if (method_exists($this, $method)) {
 				$this->$method($parts);
 				return;
