@@ -24,7 +24,7 @@
  * THE SOFTWARE. 
  */
 
-class Controller_Request_Mapper implements Controller {
+class Controller_RequestMapper implements Controller {
 	
 	private $mapper;
 	
