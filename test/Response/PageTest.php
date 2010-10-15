@@ -20,7 +20,7 @@ class Response_PageTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testRenderingWithLazyFactoryTemplating() {
-		$factory = new Response_Factory('test/Response/template/simple');
+		$factory = new Response_Directory('test/Response/template/simple');
 		
 		$page = $factory->createPage('/foo');
 		$page->header = '/header';
@@ -32,7 +32,7 @@ class Response_PageTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testRenderingInsestuousTemplates() {
-		$factory = new Response_Factory('test/Response/template/insestuous');
+		$factory = new Response_Directory('test/Response/template/insestuous');
 		
 		$page = $factory->createPage('/page');
 		

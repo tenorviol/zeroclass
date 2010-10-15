@@ -24,19 +24,25 @@
  * THE SOFTWARE. 
  */
 
-class Response_Factory {
+class Response_Directory {
 	
 	private $template_dir;
 	private $suffix;
 	private $index;
 	
-	public $default_header = null;
-	public $default_footer = null;
+	public $header = null;
+	public $footer = null;
 	
 	public function __construct($template_dir, $suffix = '.php', $index = '/index') {
 		$this->template_dir = $template_dir;
 		$this->suffix = $suffix;
 		$this->index = $index;
+	}
+	
+	public function subdirectory($dir) {
+		$subdir = clone $this;
+		$subdir->template_dir = $this->template_dir.$dir;
+		return $subdir;
 	}
 	
 	public function realTemplatePath($path) {
@@ -59,8 +65,8 @@ class Response_Factory {
 	
 	public function createPage($path) {
 		$page = new Response_Page($path, $this);
-		$page->header = $this->default_header;
-		$page->footer = $this->default_footer;
+		$page->header = $this->header;
+		$page->footer = $this->footer;
 		return $page;
 	}
 	
