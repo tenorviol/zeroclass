@@ -25,7 +25,7 @@
  */
 
 /**
- * A very simple dependency injection container.
+ * A very simple creator container.
  * 
  * PROBLEM:
  * 
@@ -94,22 +94,19 @@ class Container {
 	 * @return mixed
 	 */
 	public function __get($property) {
-		$this->$property = $this->getInstance($property);
-		return $this->$property;
+		return $this->getInstance($property);
 	}
 	
 	/**
 	 * Calling undefined methods throws an exception,
 	 * instead of E_ERRORing out of process.
-	 * Mostly used by self::__get.
 	 * 
 	 * @param string $method
 	 * @param array $arguments
-	 * @return mixed
-	 * @throws Exception
+	 * @throws NotFoundException
 	 */
 	public function __call($method, $arguments) {
-		throw new NotFoundException('Undefined method '.get_class($this)."::$method");
+		throw new BadMethodCallException(get_class($this)."::$method");
 	}
 	
 	/**
@@ -121,7 +118,11 @@ class Container {
 	 * @param string $property
 	 */
 	public function getInstance($property) {
-		$method = 'create'.ucfirst($property);
-		return $this->$method();
+		$lcproperty = strtolower($property);
+		if (!isset($this->$lcproperty)) {
+			$method = "create$property";
+			$this->$lcproperty = $this->$method();
+		}
+		return $this->$lcproperty;
 	}
 }

@@ -18,15 +18,15 @@ class ContainerTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * @expectedException NotFoundException
+	 * @expectedException BadMethodCallException
 	 */
-	public function testPropertyWithoutFactoryThrowsNotFoundException() {
+	public function testPropertyWithoutFactoryThrowsException() {
 		$container = new Container();
 		$container->john;
 	}
 	
 	/**
-	 * @expectedException NotFoundException
+	 * @expectedException BadMethodCallException
 	 */
 	public function testInstancePropertyShouldNotTriggerInfiniteLoop() {
 		$container = new Container();
@@ -34,7 +34,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * @expectedException Exception
+	 * @expectedException BadMethodCallException
 	 */
 	public function testUndefinedMethodThrowsException() {
 		$container = new Container();
