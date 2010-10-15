@@ -31,12 +31,12 @@ class Controller_Directory extends Controller_PathMethod {
 	
 	public function __construct(Container $directory, $default = 'default') {
 		$this->directory = $directory;
-		$this->default = strtolower($default);
+		$this->default = $default;
 	}
 	
 	protected function executePathMethod($path) {
 		preg_match('#^/*([^/?]*)(.*)$#', $path, $matches);
-		$directory = strtolower($matches[1]);
+		$directory = $matches[1];
 		$remainder = $matches[2];
 		$controller = null;
 		
