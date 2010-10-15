@@ -40,9 +40,9 @@ class Response_Page extends Response {
 	 * either string paths or Response_Templates.
 	 *
 	 * @param string|Response_Template $template 
-	 * @param Response_Factory $factory 
+	 * @param Response_Directory $factory 
 	 */
-	public function __construct($template, Response_Factory $factory = null) {
+	public function __construct($template, Response_Directory $factory = null) {
 		$this->factory = $factory;
 		$this->content = $this->templatize($template);
 	}
