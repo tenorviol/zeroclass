@@ -1,5 +1,7 @@
 <?php
 
+ini_set('auto_detect_line_endings', true);
+
 class Iterator_Csv implements Iterator {
   private $filename;
   private $handle;
